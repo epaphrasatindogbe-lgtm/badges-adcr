@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badge ADCR</title>
+
+<style>
+body{
+    font-family: Arial;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    background: url("https://images.unsplash.com/photo-1503428593586-e225b39bddfe") no-repeat center/cover;
+}
+
+body::before{
+    content:"";
+    position: fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    backdrop-filter: blur(5px);
+    z-index:-1;
+}
+
+input{
+    padding:10px;
+    margin:10px;
+    width:250px;
+    border-radius:5px;
+    border:none;
+}
+
+button{
+    padding:12px 25px;
+    margin:10px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+    background:#00c9a7;
+    color:white;
+    font-size:16px;
+}
+
+#downloadBtn:disabled{
+    background: gray;
+    cursor: not-allowed;
+}
+
+#badge{
+    display:none;
+}
+
+canvas{
+    border-radius:10px;
+    box-shadow:0 0 15px rgba(0,0,0,0.5);
+}
+</style>
+</head>
+
+<body>
+
+<h1>Générateur de Badge ADCR</h1>
+
+<input type="text" id="nom" placeholder="Nom"><br>
+<input type="text" id="prenom" placeholder="Prénom"><br>
+<input type="text" id="eglise" placeholder="Église"><br>
+
+<button onclick="genererBadge()">Créer Badge</button>
+
+<div id="badge">
+    <canvas id="canvas" width="500" height="500"></canvas><br>
+    <button id="downloadBtn" onclick="telecharger()" disabled>Télécharger</button>
+    <button onclick="nouveauBadge()">Télécharger un autre badge</button>
+</div>
+
+<script>
+
+let numero = 1;
+let badgePret = false;
+
+function formatNumero(num){
+    return String(num).padStart(3,'0');
+}
+
+function genererBadge(){
+
+    badgePret = false;
+    document.getElementById("downloadBtn").disabled = true;
+
+    const nom = document.getElementById("nom").value;
+    const prenom = document.getElementById("prenom").value;
+    const eglise = document.getElementById("eglise").value;
+
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0,0,500,500);
+
+    const bg = new Image();
+    bg.crossOrigin = "anonymous";
+    bg.src = "https://i.postimg.cc/pVnShFjD/adcr-logo.jpg"; // 🔥 remplace ici
+
+    bg.onload = function(){
+
+        
+
+        // fond + flou
+        ctx.filter = "blur(3px)";
+        ctx.drawImage(bg, 0, 0, 500, 500);
+        ctx.filter = "none";
+
+        ctx.fillStyle = "rgba(255,255,150,0.7)";
+        ctx.fillRect(0,0,500,500);
+
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+
+        ctx.font = "16px Arial";
+        ctx.fillText("Assemblée des Disciples de Christ Ressuscité", 250, 30);
+
+        ctx.font = "bold 20px Arial";
+        ctx.fillText("ADCR", 250, 60);
+
+        ctx.font = "bold 28px Arial";
+        ctx.fillText("Badge de la convention", 250, 110);
+        ctx.fillText("nationale", 250, 140);
+
+        ctx.textAlign = "left";
+        ctx.font = "20px Arial";
+
+        ctx.fillText("Nom et prénoms: " + nom + " " + prenom, 30, 200);
+        ctx.fillText("Église de provenance: " + eglise, 30, 240);
+        ctx.fillText("N° du badge: " + formatNumero(numero), 30, 280);
+
+        ctx.fillText("A payé 500 XOF", 280, 320);
+
+        // verset
+        ctx.beginPath();
+        ctx.roundRect(80, 370, 340, 70, 30);
+        ctx.fillStyle = "#d97706";
+        ctx.fill();
+
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.font = "16px Arial";
+        ctx.fillText("Demeurez en moi, je demeurerai en vous.", 250, 400);
+        ctx.fillText("Jean 15:4", 250, 425);
+
+        document.getElementById("badge").style.display = "block";
+
+        badgePret = true;
+        document.getElementById("downloadBtn").disabled = false;
+    }
+}
+
+// TELECHARGEMENT
+function telecharger(){
+
+    if(!badgePret){
+        alert("Veuillez générer le badge !");
+        return;
+    }
+
+    const canvas = document.getElementById("canvas");
+
+    const lien = document.createElement("a");
+    lien.download = "badge_" + formatNumero(numero) + ".png";
+    lien.href = canvas.toDataURL("image/png");
+    lien.click();
+
+    numero++;
+    badgePret = false;
+    document.getElementById("downloadBtn").disabled = true;
+}
+
+// RESET
+function nouveauBadge(){
+    document.getElementById("nom").value="";
+    document.getElementById("prenom").value="";
+    document.getElementById("eglise").value="";
+    document.getElementById("badge").style.display="none";
+}
+
+</script>
+
+</body>
+</html>
